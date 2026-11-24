@@ -1,0 +1,32 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Receive Stock: {{ medicine.name }}</h1></div>
+    <a href="{{ url_for('inventory.batches', medicine_id=medicine.id) }}" class="btn btn-outline-secondary">Back</a>
+</div>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" data-loading>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label">Batch Number <span class="text-danger">*</span></label><input type="text" name="batch_number" class="form-control" required></div>
+                        <div class="col-md-6"><label class="form-label">Quantity Received <span class="text-danger">*</span></label><input type="number" name="quantity" class="form-control" min="1" required></div>
+                        <div class="col-md-6"><label class="form-label">Manufacture Date</label><input type="date" name="manufacture_date" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label">Expiry Date <span class="text-danger">*</span></label><input type="date" name="expiry_date" class="form-control" required></div>
+                        <div class="col-md-6">
+                            <label class="form-label">Supplier</label>
+                            <select name="supplier_id" class="form-select"><option value="">Select supplier...</option>{% for s in suppliers %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
+                        </div>
+                        <div class="col-md-3"><label class="form-label">Purchase Cost (SZL)</label><input type="number" step="0.01" name="purchase_cost" class="form-control"></div>
+                        <div class="col-md-3"><label class="form-label">Selling Price (SZL)</label><input type="number" step="0.01" name="selling_price" class="form-control"></div>
+                        <div class="col-12"><label class="form-label">Notes</label><textarea name="notes" class="form-control" rows="2"></textarea></div>
+                        <div class="col-12"><button type="submit" class="btn btn-primary">Record Stock Receipt</button></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

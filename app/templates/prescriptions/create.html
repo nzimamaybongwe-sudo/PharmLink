@@ -1,0 +1,138 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Create Prescription</h1></div>
+    <a href="{{ url_for('prescriptions.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back
+    </a>
+</div>
+<form method="POST" data-loading>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if consultation %}<input type="hidden" name="consultation_id" value="{{ consultation.id }}">{% endif %}
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header"><h5 class="card-title">Patient & Validity</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Patient <span class="text-danger">*</span></label>
+                            {% if patient %}
+                            <input type="hidden" name="patient_id" value="{{ patient.id }}">
+                            <input type="text" class="form-control" value="{{ patient.full_name }} ({{ patient.patient_number }})" readonly>
+                            {% else %}
+                            <select name="patient_id" class="form-select" required>
+                                <option value="">Select patient...</option>
+                                {% for p in patients %}
+                                <option value="{{ p.id }}">{{ p.full_name }} ({{ p.patient_number }})</option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Validity (Days)</label>
+                            <input type="number" name="validity_days" class="form-control" value="30" min="1" max="365">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title">Prescribed Medicines</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="addMedicineRow">
+                        <i class="bi bi-plus me-1"></i>Add Medicine
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="medicineRows">
+                        <div class="border rounded p-3 mb-2 medicine-row">
+                            <div class="row g-2">
+                                <div class="col-md-5">
+                                    <label class="form-label">Medicine <span class="text-danger">*</span></label>
+                                    <select name="medicine_id" class="form-select" required>
+                                        <option value="">Select medicine...</option>
+                                        {% for m in medicines %}
+                                        <option value="{{ m.id }}">{{ m.name }} {{ m.strength or '' }} ({{ m.dosage_form or '' }}) — Stock: {{ m.total_stock }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Qty <span class="text-danger">*</span></label>
+                                    <input type="number" name="quantity" class="form-control" min="1" value="1" required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label">Dosage</label>
+                                    <input type="text" name="dosage" class="form-control" placeholder="e.g. 1 tablet">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Frequency</label>
+                                    <input type="text" name="frequency" class="form-control" placeholder="e.g. 3 times daily">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Duration</label>
+                                    <input type="text" name="duration" class="form-control" placeholder="e.g. 7 days">
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label">Instructions</label>
+                                    <input type="text" name="instructions" class="form-control" placeholder="e.g. Take after meals">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden template for cloning -->
+                    <div id="medicineRowTemplate" class="border rounded p-3 mb-2 medicine-row d-none">
+                        <div class="d-flex justify-content-end mb-1">
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-medicine-row"><i class="bi bi-trash"></i></button>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-5">
+                                <label class="form-label">Medicine <span class="text-danger">*</span></label>
+                                <select name="medicine_id" class="form-select">
+                                    <option value="">Select medicine...</option>
+                                    {% for m in medicines %}
+                                    <option value="{{ m.id }}">{{ m.name }} {{ m.strength or '' }} ({{ m.dosage_form or '' }}) — Stock: {{ m.total_stock }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Qty <span class="text-danger">*</span></label>
+                                <input type="number" name="quantity" class="form-control" min="1" value="1">
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Dosage</label>
+                                <input type="text" name="dosage" class="form-control" placeholder="e.g. 1 tablet">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Frequency</label>
+                                <input type="text" name="frequency" class="form-control" placeholder="e.g. 3 times daily">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Duration</label>
+                                <input type="text" name="duration" class="form-control" placeholder="e.g. 7 days">
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Instructions</label>
+                                <input type="text" name="instructions" class="form-control" placeholder="e.g. Take after meals">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <label class="form-label">Additional Clinical Notes</label>
+                    <textarea name="notes" class="form-control" rows="2"></textarea>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i>Issue Prescription</button>
+                        <a href="{{ url_for('prescriptions.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

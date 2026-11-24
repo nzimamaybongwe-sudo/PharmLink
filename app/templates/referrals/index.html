@@ -1,0 +1,26 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header"><div><h1>Referrals</h1></div></div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Referral #</th><th>Prescription</th><th>From</th><th>To</th><th>Funding</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for r in referrals.items %}
+            <tr>
+                <td><a href="{{ url_for('referrals.view', referral_id=r.id) }}" class="fw-semibold">{{ r.referral_number }}</a></td>
+                <td>{{ r.prescription.prescription_number if r.prescription else '—' }}</td>
+                <td class="text-xs">{{ r.originating_organisation.name if r.originating_organisation else '—' }}</td>
+                <td class="text-xs">{{ r.receiving_organisation.name if r.receiving_organisation else 'Unassigned' }}</td>
+                <td class="text-xs">{{ r.funding_type.replace('_',' ').title() }}</td>
+                <td><span class="badge badge-{{ r.status }}">{{ r.status.replace('_',' ').title() }}</span></td>
+                <td><a href="{{ url_for('referrals.view', referral_id=r.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7"><div class="empty-state py-4"><i class="bi bi-arrow-left-right"></i><h5>No referrals yet</h5></div></td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

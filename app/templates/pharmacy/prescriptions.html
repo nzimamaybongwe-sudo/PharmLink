@@ -1,0 +1,45 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header"><div><h1>Pharmacy Prescriptions</h1></div></div>
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="GET" class="d-flex gap-2 flex-wrap">
+            <input type="text" name="search" class="form-control" style="max-width:260px;" placeholder="Search #, patient..." value="{{ search }}">
+            <select name="status" class="form-select" style="max-width:180px;">
+                <option value="issued" {% if status_filter == 'issued' %}selected{% endif %}>Issued</option>
+                <option value="partially_dispensed" {% if status_filter == 'partially_dispensed' %}selected{% endif %}>Partially Dispensed</option>
+                <option value="fully_dispensed" {% if status_filter == 'fully_dispensed' %}selected{% endif %}>Fully Dispensed</option>
+                <option value="" {% if status_filter == '' %}selected{% endif %}>All Active</option>
+            </select>
+            <button class="btn btn-outline-primary" type="submit"><i class="bi bi-funnel"></i></button>
+        </form>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Prescription #</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+            {% for p in prescriptions.items %}
+            <tr>
+                <td><a href="{{ url_for('prescriptions.view', prescription_id=p.id) }}" class="fw-semibold">{{ p.prescription_number }}</a></td>
+                <td>{{ p.patient.full_name if p.patient else '—' }}</td>
+                <td class="text-xs">{{ p.doctor.full_name if p.doctor else '—' }}</td>
+                <td class="text-xs">{{ p.prescription_date.strftime('%d %b %Y') }}</td>
+                <td><span class="badge badge-{{ p.status }}">{{ p.status.replace('_',' ').title() }}</span></td>
+                <td>
+                    {% if p.is_processable %}
+                    <a href="{{ url_for('pharmacy.dispense', prescription_id=p.id) }}" class="btn btn-sm btn-primary">Dispense</a>
+                    {% else %}
+                    <a href="{{ url_for('prescriptions.view', prescription_id=p.id) }}" class="btn btn-sm btn-outline-secondary">View</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6"><div class="empty-state"><i class="bi bi-capsule"></i><h5>No prescriptions found</h5></div></td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

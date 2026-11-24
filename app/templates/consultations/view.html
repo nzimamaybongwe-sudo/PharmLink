@@ -1,0 +1,57 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ consultation.consultation_number }}</h1>
+        <div class="page-breadcrumb">Patient: {{ consultation.patient.full_name if consultation.patient else '—' }}</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('prescriptions.create') }}?patient_id={{ consultation.patient_id }}&consultation_id={{ consultation.id }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-file-medical me-1"></i>Write Prescription
+        </a>
+        {% if consultation.status != 'completed' %}
+        <form method="POST" action="{{ url_for('consultations.complete', consultation_id=consultation.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check2 me-1"></i>Mark Completed</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="card-title">Consultation Record</h5><span class="badge bg-secondary-subtle text-secondary">{{ consultation.status.replace('_',' ').title() }}</span></div>
+            <div class="card-body">
+                <p><strong>Chief Complaint:</strong> {{ consultation.chief_complaint }}</p>
+                {% if consultation.symptoms %}<p><strong>Symptoms:</strong> {{ consultation.symptoms }}</p>{% endif %}
+                {% if consultation.examination_findings %}<p><strong>Examination:</strong> {{ consultation.examination_findings }}</p>{% endif %}
+                {% if consultation.clinical_notes %}<p><strong>Clinical Notes:</strong> {{ consultation.clinical_notes }}</p>{% endif %}
+                {% if consultation.treatment_plan %}<p><strong>Treatment Plan:</strong> {{ consultation.treatment_plan }}</p>{% endif %}
+                {% if consultation.diagnoses.count() > 0 %}
+                <h6 class="fw-bold mt-3">Diagnoses</h6>
+                <ul>
+                {% for d in consultation.diagnoses %}
+                <li>{% if d.icd_code %}<span class="badge bg-info-subtle text-info me-1">{{ d.icd_code }}</span>{% endif %}{{ d.description }} <small class="text-muted">({{ d.diagnosis_type }})</small></li>
+                {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Vitals & Metadata</h5></div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr><td class="text-muted">Doctor</td><td>{{ consultation.doctor.full_name if consultation.doctor else '—' }}</td></tr>
+                    <tr><td class="text-muted">Date</td><td>{{ consultation.consultation_date.strftime('%d %b %Y %H:%M') }}</td></tr>
+                    <tr><td class="text-muted">BP</td><td>{{ consultation.blood_pressure or '—' }}</td></tr>
+                    <tr><td class="text-muted">Pulse</td><td>{{ consultation.pulse_rate or '—' }}</td></tr>
+                    <tr><td class="text-muted">Temp</td><td>{{ consultation.temperature or '—' }}</td></tr>
+                    <tr><td class="text-muted">Weight</td><td>{{ consultation.weight ~ ' kg' if consultation.weight else '—' }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>My Profile</h1>
+        <div class="page-breadcrumb">Account settings and information</div>
+    </div>
+    <a href="{{ url_for('auth.change_password') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-key me-1"></i> Change Password
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body text-center py-4">
+                <div class="avatar-circle mx-auto mb-3" style="width:72px;height:72px;font-size:1.5rem;">
+                    {{ current_user.first_name[0] }}{{ current_user.last_name[0] }}
+                </div>
+                <h5 class="fw-bold mb-1">{{ current_user.full_name }}</h5>
+                <p class="text-muted text-xs mb-2">{{ current_user.email }}</p>
+                {% if current_user.primary_role %}
+                <span class="badge bg-primary">{{ current_user.primary_role.display_name }}</span>
+                {% endif %}
+                {% if current_user.primary_organisation %}
+                <p class="text-muted text-xs mt-2">
+                    <i class="bi bi-building me-1"></i>{{ current_user.primary_organisation.name }}
+                </p>
+                {% endif %}
+                <div class="text-muted text-xs mt-3">
+                    <div>Last login: {{ current_user.last_login_at.strftime('%d %b %Y, %H:%M') if current_user.last_login_at else 'N/A' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Edit Profile</h5></div>
+            <div class="card-body">
+                <form method="POST" data-loading>
+                    {{ form.hidden_tag() }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form.first_name.label(class='form-label') }}
+                            {{ form.first_name(class='form-control') }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.last_name.label(class='form-label') }}
+                            {{ form.last_name(class='form-control') }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.phone.label(class='form-label') }}
+                            {{ form.phone(class='form-control') }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.profession.label(class='form-label') }}
+                            {{ form.profession(class='form-control') }}
+                        </div>
+                        <div class="col-12">
+                            {{ form.licence_number.label(class='form-label') }}
+                            {{ form.licence_number(class='form-control') }}
+                        </div>
+                        <div class="col-12">
+                            {{ form.submit(class='btn btn-primary') }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

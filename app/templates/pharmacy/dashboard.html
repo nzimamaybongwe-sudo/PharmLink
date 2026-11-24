@@ -1,0 +1,64 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Pharmacy Dashboard</h1></div>
+    <a href="{{ url_for('prescriptions.index') }}?status=issued" class="btn btn-primary btn-sm">
+        <i class="bi bi-capsule me-1"></i>Process Prescriptions
+    </a>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-warning"><i class="bi bi-hourglass-split"></i></div><div class="stat-value">{{ stats.pending }}</div><div class="stat-label">Pending Dispensing</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-success"><i class="bi bi-check2-circle"></i></div><div class="stat-value">{{ stats.dispensed_today }}</div><div class="stat-label">Dispensed Today</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-info"><i class="bi bi-clock-history"></i></div><div class="stat-value">{{ stats.partial }}</div><div class="stat-label">Partially Dispensed</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-primary"><i class="bi bi-arrow-left-right"></i></div><div class="stat-value">{{ stats.pending_referrals }}</div><div class="stat-label">Pending Referrals</div></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Prescriptions Awaiting Dispensing</h5><a href="{{ url_for('pharmacy.prescriptions') }}" class="btn btn-sm btn-outline-primary">View All</a></div>
+            <div class="card-body p-0">
+                {% if pending_prescriptions %}
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Prescription #</th><th>Patient</th><th>Date</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                    {% for p in pending_prescriptions %}
+                    <tr>
+                        <td><a href="{{ url_for('prescriptions.view', prescription_id=p.id) }}" class="fw-semibold">{{ p.prescription_number }}</a></td>
+                        <td>{{ p.patient.full_name if p.patient else '—' }}</td>
+                        <td class="text-xs">{{ p.prescription_date.strftime('%d %b %Y') }}</td>
+                        <td><span class="badge badge-{{ p.status }}">{{ p.status.replace('_',' ').title() }}</span></td>
+                        <td><a href="{{ url_for('pharmacy.dispense', prescription_id=p.id) }}" class="btn btn-sm btn-primary">Dispense</a></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state"><i class="bi bi-check2-all"></i><h5>No pending prescriptions</h5><p>All caught up!</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        {% if low_stock %}
+        <div class="card border-warning mb-3">
+            <div class="card-header bg-warning bg-opacity-10"><h5 class="card-title text-warning"><i class="bi bi-exclamation-triangle-fill me-2"></i>Low Stock</h5></div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for med in low_stock %}<li class="list-group-item d-flex justify-content-between"><span class="text-xs">{{ med.name }}</span><span class="badge bg-warning text-dark">{{ med.total_stock }}</span></li>{% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+        {% if expiring_batches %}
+        <div class="card border-warning">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-clock-history me-2 text-warning"></i>Expiring Soon (90 days)</h5></div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for b in expiring_batches %}<li class="list-group-item"><div class="text-xs fw-semibold">{{ b.medicine.name }}</div><div class="text-xxs text-muted">Batch: {{ b.batch_number }} | Exp: {{ b.expiry_date.strftime('%d %b %Y') }} | {{ b.days_to_expiry }}d left</div></li>{% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Hospital Dashboard</h1>
+        <div class="page-breadcrumb">{{ organisation.name if organisation else 'All Organisations' }}</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('patients.register') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-person-plus me-1"></i> Register Patient
+        </a>
+        <a href="{{ url_for('consultations.new_consultation') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-clipboard-plus me-1"></i> New Consultation
+        </a>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon icon-primary"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-value">{{ stats.total_patients }}</div>
+            <div class="stat-label">Total Patients</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon icon-info"><i class="bi bi-clipboard2-pulse-fill"></i></div>
+            <div class="stat-value">{{ stats.total_consultations }}</div>
+            <div class="stat-label">Consultations</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon icon-success"><i class="bi bi-file-medical-fill"></i></div>
+            <div class="stat-value">{{ stats.prescriptions_today }}</div>
+            <div class="stat-label">Prescriptions Today</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon icon-warning"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-value">{{ stats.pending_prescriptions }}</div>
+            <div class="stat-label">Pending Dispensing</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Recent Prescriptions -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title"><i class="bi bi-file-medical me-2"></i>Recent Prescriptions</h5>
+                <a href="{{ url_for('prescriptions.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_prescriptions %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr>
+                            <th>Prescription #</th><th>Patient</th><th>Date</th><th>Status</th>
+                        </tr></thead>
+                        <tbody>
+                        {% for p in recent_prescriptions %}
+                        <tr>
+                            <td><a href="{{ url_for('prescriptions.view', prescription_id=p.id) }}" class="fw-semibold">{{ p.prescription_number }}</a></td>
+                            <td>{{ p.patient.full_name if p.patient else '—' }}</td>
+                            <td>{{ p.prescription_date.strftime('%d %b %Y') }}</td>
+                            <td>
+                                <span class="badge badge-{{ p.status }} status-badge">
+                                    {{ p.status.replace('_',' ').title() }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-file-medical"></i>
+                    <h5>No prescriptions yet</h5>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="col-lg-4">
+        {% if low_stock %}
+        <div class="card border-warning mb-3">
+            <div class="card-header bg-warning bg-opacity-10">
+                <h5 class="card-title text-warning">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Low Stock Alert
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for med in low_stock %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="text-xs">{{ med.name }}</span>
+                    <span class="badge bg-warning text-dark">{{ med.total_stock }} left</span>
+                </li>
+                {% endfor %}
+                </ul>
+                <div class="p-2 text-end">
+                    <a href="{{ url_for('inventory.dashboard') }}" class="btn btn-sm btn-outline-warning">View Inventory</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if stats.pending_referrals > 0 %}
+        <div class="card border-info">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon icon-info"><i class="bi bi-arrow-left-right"></i></div>
+                <div>
+                    <div class="stat-value">{{ stats.pending_referrals }}</div>
+                    <div class="stat-label">Pending Referrals</div>
+                    <a href="{{ url_for('referrals.index') }}" class="text-xs text-info">View referrals →</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

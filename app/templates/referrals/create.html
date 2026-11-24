@@ -1,0 +1,47 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Create Referral</h1><div class="page-breadcrumb">Prescription: {{ prescription.prescription_number }}</div></div>
+    <a href="{{ url_for('prescriptions.view', prescription_id=prescription.id) }}" class="btn btn-outline-secondary">Back</a>
+</div>
+<form method="POST" data-loading>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Receiving Pharmacy</label>
+                    <select name="receiving_org_id" class="form-select">
+                        <option value="">Select pharmacy (or leave as Draft)...</option>
+                        {% for ph in pharmacies %}<option value="{{ ph.id }}">{{ ph.name }} ({{ ph.town or 'Eswatini' }})</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Funding Type</label>
+                    <select name="funding_type" class="form-select">
+                        <option value="patient_funded">Patient Funded</option>
+                        <option value="government_funded">Government Funded</option>
+                        <option value="insurance">Insurance</option>
+                    </select>
+                </div>
+                <div class="col-12"><label class="form-label">Reason for Referral</label><textarea name="reason" class="form-control" rows="2" placeholder="e.g. Medicine out of stock at hospital pharmacy"></textarea></div>
+            </div>
+            <h6>Select Medicines to Refer</h6>
+            <table class="table table-sm">
+                <thead><tr><th>Select</th><th>Medicine</th><th>Remaining Qty</th><th>Qty to Refer</th></tr></thead>
+                <tbody>
+                {% for item in pending_items %}
+                <tr>
+                    <td><input type="checkbox" name="item_id" value="{{ item.id }}" checked class="form-check-input"></td>
+                    <td>{{ item.medicine_name }} {{ item.strength or '' }}</td>
+                    <td>{{ item.quantity_remaining }}</td>
+                    <td><input type="number" name="quantity" class="form-control form-control-sm" style="width:90px;" value="{{ item.quantity_remaining }}" min="1" max="{{ item.quantity_remaining }}"></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Submit Referral</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Dispense Prescription</h1>
+        <div class="page-breadcrumb">{{ prescription.prescription_number }} — {{ prescription.patient.full_name if prescription.patient else '—' }}</div>
+    </div>
+    <a href="{{ url_for('prescriptions.view', prescription_id=prescription.id) }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Back to Prescription
+    </a>
+</div>
+
+{% if not items_with_batches %}
+<div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i>All items on this prescription have been fully dispensed.</div>
+{% else %}
+<form method="POST" data-loading>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header"><h5 class="card-title">Items to Dispense</h5></div>
+                <div class="card-body">
+                    {% for ib in items_with_batches %}
+                    {% set item = ib.item %}
+                    {% set batches = ib.batches %}
+                    <div class="border rounded p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold mb-0">{{ item.medicine_name }}</h6>
+                                <div class="text-xs text-muted">{{ item.strength or '' }} {{ item.dosage_form or '' }}</div>
+                            </div>
+                            <span class="badge bg-primary-subtle text-primary">{{ item.quantity_remaining }} remaining</span>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Select Batch (FEFO order)</label>
+                                <select name="batch_{{ item.id }}" class="form-select" required>
+                                    <option value="">Choose batch...</option>
+                                    {% for batch in batches %}
+                                    <option value="{{ batch.id }}">
+                                        {{ batch.batch_number }} — {{ batch.quantity_remaining }} available — Exp: {{ batch.expiry_date.strftime('%d %b %Y') }}
+                                    </option>
+                                    {% else %}
+                                    <option disabled>No stock available</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Quantity to Dispense</label>
+                                <input type="number" name="qty_{{ item.id }}" class="form-control"
+                                       min="1" max="{{ item.quantity_remaining }}"
+                                       value="{{ item.quantity_remaining }}"
+                                       {% if not batches %}disabled{% endif %}>
+                                {% if not batches %}
+                                <div class="form-text text-danger"><i class="bi bi-exclamation-triangle"></i> No stock available. Consider a referral.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if item.instructions %}<div class="text-xs text-muted mt-2"><i class="bi bi-info-circle me-1"></i>{{ item.instructions }}</div>{% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Dispensing Notes (optional)</label>
+                        <textarea name="notes" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check2 me-1"></i>Confirm Dispensing</button>
+                        <a href="{{ url_for('prescriptions.view', prescription_id=prescription.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="{{ url_for('referrals.create', prescription_id=prescription.id) }}" class="btn btn-outline-info ms-auto">
+                            <i class="bi bi-arrow-left-right me-1"></i>Refer Instead
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header"><h5 class="card-title">Prescription Summary</h5></div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr><td class="text-muted">Patient</td><td class="fw-semibold">{{ prescription.patient.full_name if prescription.patient else '—' }}</td></tr>
+                        <tr><td class="text-muted">Doctor</td><td>{{ prescription.doctor.full_name if prescription.doctor else '—' }}</td></tr>
+                        <tr><td class="text-muted">Date</td><td>{{ prescription.prescription_date.strftime('%d %b %Y') }}</td></tr>
+                        <tr><td class="text-muted">Valid Until</td><td class="{{ 'text-danger' if prescription.is_expired else '' }}">{{ prescription.expiry_date.strftime('%d %b %Y') if prescription.expiry_date else '—' }}</td></tr>
+                        <tr><td class="text-muted">Status</td><td><span class="badge badge-{{ prescription.status }}">{{ prescription.status.replace('_',' ').title() }}</span></td></tr>
+                    </table>
+                    <div class="alert alert-info mt-3 py-2 text-xs">
+                        <i class="bi bi-info-circle me-1"></i>Batches are listed in FEFO order (First Expiry, First Out).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endif %}
+{% endblock %}

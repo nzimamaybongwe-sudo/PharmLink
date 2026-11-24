@@ -1,0 +1,19 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header"><div><h1>Record Payment</h1></div><a href="{{ url_for('finance.payments') }}" class="btn btn-outline-secondary">Back</a></div>
+<div class="row justify-content-center"><div class="col-lg-6"><div class="card"><div class="card-body">
+    <form method="POST" data-loading>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3"><label class="form-label">Funding Type</label>
+            <select name="funding_type" class="form-select"><option value="patient_funded">Patient Funded</option><option value="government_funded">Government Funded</option><option value="insurance">Insurance</option></select>
+        </div>
+        <div class="mb-3"><label class="form-label">Funding Reference</label><input type="text" name="funding_reference" class="form-control"></div>
+        <div class="row g-2 mb-3">
+            <div class="col-6"><label class="form-label">Amount Due (SZL)</label><input type="number" step="0.01" name="amount_due" class="form-control" required></div>
+            <div class="col-6"><label class="form-label">Amount Paid (SZL)</label><input type="number" step="0.01" name="amount_paid" class="form-control" value="0"></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Notes</label><textarea name="notes" class="form-control" rows="2"></textarea></div>
+        <button type="submit" class="btn btn-primary w-100">Record Payment</button>
+    </form>
+</div></div></div></div>
+{% endblock %}

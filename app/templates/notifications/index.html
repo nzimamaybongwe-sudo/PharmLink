@@ -1,0 +1,37 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Notifications</h1></div>
+    {% if notifications.total > 0 %}
+    <form method="POST" action="{{ url_for('notifications.mark_all_read') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-outline-secondary btn-sm">Mark All Read</button>
+    </form>
+    {% endif %}
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+        {% for n in notifications.items %}
+        <li class="list-group-item {% if not n.is_read %}bg-primary bg-opacity-5{% endif %}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-semibold text-sm">{{ n.title }}</div>
+                    <div class="text-xs text-muted">{{ n.message }}</div>
+                    <div class="text-xxs text-muted mt-1">{{ n.created_at.strftime('%d %b %Y %H:%M') }}</div>
+                </div>
+                {% if not n.is_read %}
+                <form method="POST" action="{{ url_for('notifications.mark_read', notif_id=n.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-xs btn-outline-secondary btn-sm py-0 px-1 text-xs">Mark Read</button>
+                </form>
+                {% endif %}
+            </div>
+        </li>
+        {% else %}
+        <li class="list-group-item"><div class="empty-state"><i class="bi bi-bell-slash"></i><h5>No notifications</h5></div></li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

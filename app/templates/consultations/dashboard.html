@@ -1,0 +1,38 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Doctor Dashboard</h1><div class="page-breadcrumb">Welcome, Dr. {{ current_user.last_name }}</div></div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('consultations.new_consultation') }}" class="btn btn-primary btn-sm"><i class="bi bi-clipboard-plus me-1"></i>New Consultation</a>
+        <a href="{{ url_for('prescriptions.create') }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-medical me-1"></i>New Prescription</a>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon icon-primary"><i class="bi bi-calendar-check"></i></div><div class="stat-value">{{ stats.my_consultations_today }}</div><div class="stat-label">Consultations Today</div></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon icon-info"><i class="bi bi-clipboard2-pulse"></i></div><div class="stat-value">{{ stats.my_consultations_total }}</div><div class="stat-label">Total Consultations</div></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon icon-warning"><i class="bi bi-hourglass-split"></i></div><div class="stat-value">{{ stats.open_consultations }}</div><div class="stat-label">Open Consultations</div></div></div>
+</div>
+<div class="card">
+    <div class="card-header"><h5 class="card-title">Recent Consultations</h5><a href="{{ url_for('consultations.index') }}" class="btn btn-sm btn-outline-primary">View All</a></div>
+    <div class="card-body p-0">
+        {% if recent %}
+        <table class="table table-hover mb-0">
+            <thead><tr><th>#</th><th>Patient</th><th>Date</th><th>Chief Complaint</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for c in recent %}
+            <tr>
+                <td><a href="{{ url_for('consultations.view', consultation_id=c.id) }}" class="fw-semibold">{{ c.consultation_number }}</a></td>
+                <td>{{ c.patient.full_name if c.patient else '—' }}</td>
+                <td class="text-xs">{{ c.consultation_date.strftime('%d %b %Y %H:%M') }}</td>
+                <td class="text-xs">{{ c.chief_complaint[:50] }}</td>
+                <td><span class="badge bg-secondary-subtle text-secondary">{{ c.status.replace('_',' ').title() }}</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state py-4"><i class="bi bi-clipboard2-pulse"></i><h5>No consultations yet</h5></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

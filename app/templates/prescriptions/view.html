@@ -1,0 +1,159 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ prescription.prescription_number }}</h1>
+        <div class="page-breadcrumb">
+            Issued for {{ prescription.patient.full_name if prescription.patient else '—' }}
+            <span class="badge badge-{{ prescription.status }} status-badge ms-2">{{ prescription.status.replace('_',' ').title() }}</span>
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        {% if current_user.is_pharmacist() and prescription.is_processable %}
+        <a href="{{ url_for('pharmacy.dispense', prescription_id=prescription.id) }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-capsule me-1"></i>Dispense
+        </a>
+        {% endif %}
+        {% if current_user.is_doctor() and prescription.is_processable %}
+        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal">
+            <i class="bi bi-x-circle me-1"></i>Cancel
+        </button>
+        {% endif %}
+        <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="card-title">Prescription Details</h5></div>
+            <div class="card-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-6"><small class="text-muted">Patient</small><div class="fw-semibold">{{ prescription.patient.full_name if prescription.patient else '—' }}</div></div>
+                    <div class="col-6"><small class="text-muted">Patient #</small><div>{{ prescription.patient.patient_number if prescription.patient else '—' }}</div></div>
+                    <div class="col-6"><small class="text-muted">Prescribing Doctor</small><div>{{ prescription.doctor.full_name if prescription.doctor else '—' }}</div></div>
+                    <div class="col-6"><small class="text-muted">Date Issued</small><div>{{ prescription.prescription_date.strftime('%d %B %Y') }}</div></div>
+                    <div class="col-6"><small class="text-muted">Valid Until</small><div class="{{ 'text-danger fw-bold' if prescription.is_expired else '' }}">{{ prescription.expiry_date.strftime('%d %B %Y') if prescription.expiry_date else '—' }}</div></div>
+                    {% if prescription.consultation %}<div class="col-6"><small class="text-muted">Consultation</small><div><a href="{{ url_for('consultations.view', consultation_id=prescription.consultation_id) }}">{{ prescription.consultation.consultation_number }}</a></div></div>{% endif %}
+                </div>
+
+                {% if prescription.notes %}
+                <div class="alert alert-info py-2"><small><strong>Notes:</strong> {{ prescription.notes }}</small></div>
+                {% endif %}
+
+                <h6 class="fw-bold text-muted text-uppercase mb-2" style="font-size:.7rem;letter-spacing:.08em;">Prescribed Medicines</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>Medicine</th><th>Strength</th><th>Dosage</th><th>Frequency</th><th>Duration</th><th>Qty</th><th>Dispensed</th><th>Remaining</th></tr></thead>
+                        <tbody>
+                        {% for item in prescription.items %}
+                        <tr>
+                            <td class="fw-semibold">{{ item.medicine_name }}</td>
+                            <td class="text-xs text-muted">{{ item.strength or '—' }}</td>
+                            <td class="text-xs">{{ item.dosage or '—' }}</td>
+                            <td class="text-xs">{{ item.frequency or '—' }}</td>
+                            <td class="text-xs">{{ item.duration or '—' }}</td>
+                            <td class="fw-semibold text-center">{{ item.quantity }}</td>
+                            <td class="text-center text-success">{{ item.quantity_dispensed }}</td>
+                            <td class="text-center {% if item.quantity_remaining > 0 %}text-warning fw-semibold{% else %}text-muted{% endif %}">{{ item.quantity_remaining }}</td>
+                        </tr>
+                        {% if item.instructions %}
+                        <tr><td colspan="8" class="text-xs text-muted pb-2"><i class="bi bi-info-circle me-1"></i>{{ item.instructions }}</td></tr>
+                        {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% if prescription.dispensing_records.count() > 0 %}
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Dispensing History</h5></div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Dispensing #</th><th>Date</th><th>Pharmacist</th><th>Partial</th></tr></thead>
+                    <tbody>
+                    {% for rec in prescription.dispensing_records %}
+                    <tr>
+                        <td class="fw-semibold">{{ rec.dispensing_number }}</td>
+                        <td class="text-xs">{{ rec.dispensed_at.strftime('%d %b %Y %H:%M') }}</td>
+                        <td class="text-xs">{{ rec.pharmacist.full_name if rec.pharmacist else '—' }}</td>
+                        <td>{% if rec.is_partial %}<span class="badge bg-warning-subtle text-warning">Partial</span>{% else %}<span class="badge bg-success-subtle text-success">Complete</span>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        {% if prescription.qr_code %}
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-qr-code me-2"></i>Prescription QR Code</h5></div>
+            <div class="card-body">
+                <div class="qr-container">
+                    <img src="{{ url_for('static', filename='qrcodes/qr_' + prescription.prescription_number + '.png') }}" 
+                         alt="Prescription QR Code" onerror="this.style.display='none'">
+                    <div class="mt-2 text-xs text-muted">{{ prescription.prescription_number }}</div>
+                </div>
+                <div class="text-xs text-muted mt-2">
+                    <i class="bi bi-shield-check me-1 text-success"></i>Secure token — scan to process
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Status</h5></div>
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge badge-{{ prescription.status }} status-badge fs-6 py-2 px-3">{{ prescription.status.replace('_',' ').title() }}</span>
+                </div>
+                {% if prescription.is_expired %}
+                <div class="alert alert-danger py-2 text-xs"><i class="bi bi-clock-history me-1"></i>This prescription has expired.</div>
+                {% endif %}
+                {% if prescription.cancelled_at %}
+                <div class="alert alert-secondary py-2 text-xs">
+                    <strong>Cancelled:</strong> {{ prescription.cancelled_at.strftime('%d %b %Y') }}<br>
+                    {% if prescription.cancelled_reason %}Reason: {{ prescription.cancelled_reason }}{% endif %}
+                </div>
+                {% endif %}
+                {% if prescription.referrals.count() > 0 %}
+                <div class="mt-2">
+                    <small class="text-muted">Referrals</small>
+                    {% for ref in prescription.referrals %}
+                    <div><a href="{{ url_for('referrals.view', referral_id=ref.id) }}" class="text-xs">{{ ref.referral_number }}</a>
+                    <span class="badge badge-{{ ref.status }} ms-1">{{ ref.status }}</span></div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if current_user.is_doctor() and prescription.is_processable %}
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title text-danger">Cancel Prescription</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <form method="POST" action="{{ url_for('prescriptions.cancel', prescription_id=prescription.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-body">
+                <p>Are you sure you want to cancel prescription <strong>{{ prescription.prescription_number }}</strong>?</p>
+                <label class="form-label">Reason for cancellation</label>
+                <textarea name="reason" class="form-control" rows="3" placeholder="Optional reason..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Keep Prescription</button>
+                <button type="submit" class="btn btn-danger">Cancel Prescription</button>
+            </div>
+        </form>
+    </div></div>
+</div>
+{% endif %}
+{% endblock %}

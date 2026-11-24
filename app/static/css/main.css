@@ -1,0 +1,464 @@
+/* PharmLink - Main Stylesheet */
+/* ── Variables ── */
+:root {
+    --sidebar-width: 260px;
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #94a3b8;
+    --sidebar-active-bg: rgba(99, 102, 241, 0.15);
+    --sidebar-active-text: #818cf8;
+    --sidebar-hover-bg: rgba(255,255,255,0.05);
+    --topbar-height: 60px;
+    --primary: #4f46e5;
+    --primary-light: #818cf8;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --bg-light: #f8fafc;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --card-shadow-hover: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+    --border-color: #e2e8f0;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-light);
+    color: #1e293b;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+a { text-decoration: none; }
+a:hover { text-decoration: none; }
+
+/* ── Layout ── */
+#pharmlink-wrapper {
+    min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 1000;
+    transition: width 0.3s ease;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sidebar-header {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+}
+
+.brand-icon {
+    font-size: 1.5rem;
+    color: var(--sidebar-active-text);
+}
+
+.brand-logo {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 8px;
+    padding: 3px;
+    flex-shrink: 0;
+}
+
+.auth-brand-logo {
+    max-height: 82px;
+    width: auto;
+    object-fit: contain;
+}
+
+.sidebar-user {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0.75rem 1rem;
+}
+
+.avatar-circle {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #4f46e5, #818cf8);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+.user-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+}
+
+.user-role {
+    font-size: 0.7rem;
+    color: var(--sidebar-text);
+    white-space: nowrap;
+}
+
+.sidebar-category {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #475569;
+    padding: 1rem 0.75rem 0.25rem;
+}
+
+.sidebar-menu .nav-link {
+    color: var(--sidebar-text);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 2px;
+    transition: all 0.15s ease;
+}
+
+.sidebar-menu .nav-link:hover {
+    background: var(--sidebar-hover-bg);
+    color: #e2e8f0;
+}
+
+.sidebar-menu .nav-link.active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-active-text);
+}
+
+.nav-icon { font-size: 1rem; flex-shrink: 0; }
+
+.sidebar-footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-footer .nav-link {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--sidebar-text);
+    transition: color 0.15s;
+}
+.sidebar-footer .nav-link:hover { color: #e2e8f0; }
+.sidebar-footer .text-danger:hover { color: #fca5a5 !important; }
+
+/* ── Main Content ── */
+.main-content {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease;
+    background: linear-gradient(rgba(15, 23, 42, 0.22), rgba(15, 23, 42, 0.32)),
+                url('../images/bg-app.jpg') center/cover no-repeat fixed;
+}
+
+/* ── Topbar ── */
+.topbar {
+    height: var(--topbar-height);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.sidebar-toggle { color: #64748b; border: none !important; }
+
+/* ── Page Content ── */
+.page-content { flex: 1; }
+
+/* ── Page Header ── */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(10px);
+    padding: 0.9rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+.page-header h1 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+.page-breadcrumb {
+    font-size: 0.75rem;
+    color: #475569;
+    margin-top: 0.125rem;
+}
+
+/* ── Stat Cards ── */
+.stat-card {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    transition: box-shadow 0.2s, transform 0.2s;
+    height: 100%;
+}
+.stat-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-1px);
+}
+.stat-card .stat-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.375rem;
+    margin-bottom: 0.75rem;
+}
+.stat-card .stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.1;
+}
+.stat-card .stat-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+.stat-card .stat-change {
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
+    display: flex; align-items: center; gap: 0.25rem;
+}
+.icon-primary { background: rgba(79,70,229,0.1); color: #4f46e5; }
+.icon-success { background: rgba(16,185,129,0.1); color: #10b981; }
+.icon-warning { background: rgba(245,158,11,0.1); color: #f59e0b; }
+.icon-danger  { background: rgba(239,68,68,0.1);  color: #ef4444; }
+.icon-info    { background: rgba(6,182,212,0.1);   color: #06b6d4; }
+
+/* ── Cards ── */
+.card {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+.card-header {
+    background: rgba(255, 255, 255, 0.75);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+    border-radius: 12px 12px 0 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}
+.card-body { padding: 1.25rem; }
+
+/* ── Tables ── */
+.table { font-size: 0.8rem; }
+.table thead th {
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    border-bottom: 2px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+}
+.table td { padding: 0.75rem 1rem; vertical-align: middle; }
+.table-hover tbody tr:hover { background: #f8fafc; }
+.table-actions .btn { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+
+/* ── Badges ── */
+.badge { font-size: 0.65rem; font-weight: 600; padding: 0.3em 0.6em; border-radius: 6px; }
+.status-badge { letter-spacing: 0.03em; }
+
+/* ── Forms ── */
+.form-label { font-size: 0.8rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem; }
+.form-control, .form-select {
+    font-size: 0.85rem;
+    border-color: var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+}
+.form-text { font-size: 0.72rem; }
+
+/* ── Buttons ── */
+.btn { font-size: 0.8rem; font-weight: 500; border-radius: 8px; }
+.btn-primary { background: var(--primary); border-color: var(--primary); }
+.btn-primary:hover { background: #4338ca; border-color: #4338ca; }
+.btn-sm { padding: 0.3rem 0.65rem; font-size: 0.75rem; }
+
+/* ── Auth Layout ── */
+.auth-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(rgba(15, 23, 42, 0.62), rgba(30, 27, 75, 0.72)),
+                url('../images/bg-login.jpg') center/cover no-repeat fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+.auth-alerts { position: fixed; top: 1rem; right: 1rem; z-index: 9999; min-width: 300px; }
+.auth-card {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 25px rgba(0,0,0,0.3);
+}
+.auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+}
+.auth-brand-icon { font-size: 2rem; color: var(--primary); }
+.auth-brand-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.03em;
+}
+.auth-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+.auth-subtitle { font-size: 0.8rem; color: #64748b; text-align: center; margin-bottom: 1.5rem; }
+
+/* ── Pagination ── */
+.pagination .page-link {
+    font-size: 0.8rem;
+    color: var(--primary);
+    border-color: var(--border-color);
+    border-radius: 6px !important;
+    margin: 0 2px;
+}
+.pagination .page-item.active .page-link {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+/* ── Empty State ── */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #94a3b8;
+}
+.empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+.empty-state h5 { font-size: 1rem; color: #64748b; }
+.empty-state p { font-size: 0.8rem; }
+
+/* ── Prescription status colours ── */
+.badge-pending          { background: rgba(100,116,139,0.15); color: #475569; }
+.badge-issued           { background: rgba(79,70,229,0.12);   color: #4f46e5; }
+.badge-partially_dispensed { background: rgba(245,158,11,0.12); color: #d97706; }
+.badge-fully_dispensed  { background: rgba(16,185,129,0.12);  color: #059669; }
+.badge-referred         { background: rgba(6,182,212,0.12);   color: #0891b2; }
+.badge-cancelled        { background: rgba(239,68,68,0.12);   color: #dc2626; }
+.badge-expired          { background: rgba(107,114,128,0.12); color: #6b7280; }
+
+/* ── Referral status colours ── */
+.badge-sent     { background: rgba(79,70,229,0.12);  color: #4f46e5; }
+.badge-accepted { background: rgba(16,185,129,0.12); color: #059669; }
+.badge-rejected { background: rgba(239,68,68,0.12);  color: #dc2626; }
+.badge-fulfilled{ background: rgba(16,185,129,0.15); color: #047857; }
+.badge-draft    { background: rgba(100,116,139,0.1); color: #64748b; }
+
+/* ── Responsive sidebar ── */
+@media (max-width: 768px) {
+    .sidebar { width: 0; overflow: hidden; }
+    .sidebar.open { width: var(--sidebar-width); }
+    .main-content { margin-left: 0; }
+    .sidebar-toggle { display: block !important; }
+}
+
+/* ── Utilities ── */
+.text-xs { font-size: 0.75rem; }
+.text-xxs { font-size: 0.65rem; }
+.fw-semibold { font-weight: 600; }
+.rounded-pill-sm { border-radius: 999px !important; }
+.cursor-pointer { cursor: pointer; }
+
+/* ── QR code display ── */
+.qr-container {
+    text-align: center;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px dashed var(--border-color);
+}
+.qr-container img {
+    max-width: 180px;
+    border-radius: 8px;
+}
+
+/* ── Stock level indicator ── */
+.stock-level { display: flex; align-items: center; gap: 0.5rem; }
+.stock-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.stock-bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s; }
+
+/* ── Print ── */
+@media print {
+    .sidebar, .topbar, .btn, .alert { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    .page-content { padding: 0 !important; }
+}
+

@@ -1,0 +1,53 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Add Organisation</h1></div>
+    <a href="{{ url_for('admin.organisations') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back
+    </a>
+</div>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" data-loading>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Organisation Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Type <span class="text-danger">*</span></label>
+                            <select name="org_type" class="form-select" required>
+                                <option value="">Select type...</option>
+                                <option value="hospital">Hospital</option>
+                                <option value="internal_pharmacy">Internal Pharmacy</option>
+                                <option value="community_pharmacy">Community Pharmacy</option>
+                                <option value="private_pharmacy">Private Pharmacy</option>
+                                <option value="public_facility">Public Health Facility</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6"><label class="form-label">Registration Number</label><input type="text" name="registration_number" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label">Licence Number</label><input type="text" name="licence_number" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label">Email</label><input type="email" name="email" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-control"></div>
+                        <div class="col-12"><label class="form-label">Physical Address</label><textarea name="physical_address" class="form-control" rows="2"></textarea></div>
+                        <div class="col-md-6"><label class="form-label">Town</label><input type="text" name="town" class="form-control"></div>
+                        <div class="col-md-6">
+                            <label class="form-label">Region</label>
+                            <select name="region" class="form-select">
+                                <option value="">Select...</option>
+                                <option>Hhohho</option><option>Manzini</option><option>Shiselweni</option><option>Lubombo</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Create Organisation</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

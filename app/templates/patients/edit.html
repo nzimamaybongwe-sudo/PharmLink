@@ -1,0 +1,41 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Edit Patient: {{ patient.full_name }}</h1><div class="page-breadcrumb">{{ patient.patient_number }}</div></div>
+    <a href="{{ url_for('patients.view', patient_id=patient.id) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back
+    </a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="POST" data-loading>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3 mb-4">
+                <div class="col-md-4"><label class="form-label">First Name <span class="text-danger">*</span></label><input type="text" name="first_name" class="form-control" value="{{ patient.first_name }}" required></div>
+                <div class="col-md-4"><label class="form-label">Last Name <span class="text-danger">*</span></label><input type="text" name="last_name" class="form-control" value="{{ patient.last_name }}" required></div>
+                <div class="col-md-4"><label class="form-label">Date of Birth</label><input type="date" name="date_of_birth" class="form-control" value="{{ patient.date_of_birth.strftime('%Y-%m-%d') if patient.date_of_birth else '' }}"></div>
+                <div class="col-md-4">
+                    <label class="form-label">Gender</label>
+                    <select name="gender" class="form-select">
+                        <option value="">Select...</option>
+                        <option value="male" {% if patient.gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if patient.gender == 'female' %}selected{% endif %}>Female</option>
+                        <option value="other" {% if patient.gender == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4"><label class="form-label">National ID</label><input type="text" name="national_id" class="form-control" value="{{ patient.national_id or '' }}"></div>
+                <div class="col-md-4"><label class="form-label">Blood Type</label><input type="text" name="blood_type" class="form-control" value="{{ patient.blood_type or '' }}"></div>
+                <div class="col-md-6"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-control" value="{{ patient.phone or '' }}"></div>
+                <div class="col-md-6"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="{{ patient.email or '' }}"></div>
+                <div class="col-12"><label class="form-label">Physical Address</label><textarea name="physical_address" class="form-control" rows="2">{{ patient.physical_address or '' }}</textarea></div>
+                <div class="col-md-6"><label class="form-label">Town</label><input type="text" name="town" class="form-control" value="{{ patient.town or '' }}"></div>
+                <div class="col-md-6"><label class="form-label">Emergency Contact Name</label><input type="text" name="emergency_name" class="form-control" value="{{ patient.emergency_name or '' }}"></div>
+                <div class="col-md-6"><label class="form-label">Emergency Contact Phone</label><input type="tel" name="emergency_phone" class="form-control" value="{{ patient.emergency_phone or '' }}"></div>
+                <div class="col-md-6"><label class="form-label">Allergies</label><textarea name="allergies" class="form-control" rows="2">{{ patient.allergies or '' }}</textarea></div>
+                <div class="col-md-6"><label class="form-label">Chronic Conditions</label><textarea name="chronic_conditions" class="form-control" rows="2">{{ patient.chronic_conditions or '' }}</textarea></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

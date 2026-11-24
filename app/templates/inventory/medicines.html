@@ -1,0 +1,53 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Medicine Catalogue</h1><div class="page-breadcrumb">{{ medicines.total }} medicines</div></div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('inventory.categories') }}" class="btn btn-outline-secondary btn-sm">Categories</a>
+        <a href="{{ url_for('inventory.suppliers') }}" class="btn btn-outline-secondary btn-sm">Suppliers</a>
+        <a href="{{ url_for('inventory.add_medicine') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus me-1"></i>Add Medicine</a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="GET" class="d-flex gap-2 flex-wrap">
+            <input type="text" name="search" class="form-control" style="max-width:280px;" placeholder="Search name, code, barcode..." value="{{ search }}">
+            <select name="category" class="form-select" style="max-width:200px;">
+                <option value="">All Categories</option>
+                {% for c in categories %}<option value="{{ c.id }}" {% if c.id == category_id %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+            </select>
+            <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Code</th><th>Medicine Name</th><th>Strength / Form</th><th>Category</th><th>Stock</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for m in medicines.items %}
+            <tr>
+                <td class="text-xs fw-semibold">{{ m.medicine_code }}</td>
+                <td><div class="fw-semibold">{{ m.name }}</div><div class="text-xxs text-muted">{{ m.generic_name or '' }}</div></td>
+                <td class="text-xs">{{ m.strength or '—' }} {{ m.dosage_form or '' }}</td>
+                <td class="text-xs">{{ m.category.name if m.category else '—' }}</td>
+                <td>
+                    {% if m.is_low_stock %}
+                    <span class="badge bg-danger-subtle text-danger">{{ m.total_stock }} (Low)</span>
+                    {% else %}
+                    <span class="badge bg-success-subtle text-success">{{ m.total_stock }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('inventory.batches', medicine_id=m.id) }}" class="btn btn-sm btn-outline-primary">Batches</a>
+                    <a href="{{ url_for('inventory.receive_stock', medicine_id=m.id) }}" class="btn btn-sm btn-outline-success">+ Stock</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6"><div class="empty-state"><i class="bi bi-pill"></i><h5>No medicines found</h5></div></td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Platform Dashboard</h1><div class="page-breadcrumb">System-wide overview</div></div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon icon-primary"><i class="bi bi-buildings-fill"></i></div>
+            <div class="stat-value">{{ stats.total_organisations }}</div>
+            <div class="stat-label">Total Organisations</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon icon-info"><i class="bi bi-hospital-fill"></i></div>
+            <div class="stat-value">{{ stats.hospitals }}</div>
+            <div class="stat-label">Hospitals</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon icon-success"><i class="bi bi-capsule-pill"></i></div>
+            <div class="stat-value">{{ stats.pharmacies }}</div>
+            <div class="stat-label">Pharmacies</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon icon-warning"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-value">{{ stats.active_users }}</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Organisations</h5>
+                <a href="{{ url_for('admin.create_organisation') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus me-1"></i>Add Organisation
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Name</th><th>Type</th><th>Status</th></tr></thead>
+                        <tbody>
+                        {% for org in organisations %}
+                        <tr>
+                            <td class="fw-semibold">{{ org.name }}</td>
+                            <td><span class="badge bg-secondary">{{ org.org_type_display }}</span></td>
+                            <td>
+                                {% if org.is_active %}
+                                <span class="badge bg-success-subtle text-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Recent Activity</h5></div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for log in stats.recent_activity %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-xs fw-semibold">{{ log.action.replace('_',' ').title() }}</div>
+                            <div class="text-xxs text-muted">{{ log.description or '' }}</div>
+                        </div>
+                        <div class="text-xxs text-muted">{{ log.created_at.strftime('%H:%M') }}</div>
+                    </div>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted text-xs text-center py-3">No recent activity</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Inventory Dashboard</h1></div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('inventory.add_medicine') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus me-1"></i>Add Medicine</a>
+        <a href="{{ url_for('inventory.medicines') }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pill me-1"></i>View All</a>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-primary"><i class="bi bi-pill"></i></div><div class="stat-value">{{ stats.total_medicines }}</div><div class="stat-label">Total Medicines</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-warning"><i class="bi bi-exclamation-triangle"></i></div><div class="stat-value">{{ stats.low_stock }}</div><div class="stat-label">Low Stock Items</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-danger"><i class="bi bi-calendar-x"></i></div><div class="stat-value">{{ stats.expired_batches }}</div><div class="stat-label">Expired Batches</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-info"><i class="bi bi-clock-history"></i></div><div class="stat-value">{{ stats.expiring_soon }}</div><div class="stat-label">Expiring ≤90 Days</div></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Low Stock Medicines</h5></div>
+            <div class="card-body p-0">
+                {% if low_stock_items %}
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Medicine</th><th>Code</th><th>Stock</th><th>Reorder Level</th><th></th></tr></thead>
+                    <tbody>
+                    {% for med in low_stock_items %}
+                    <tr>
+                        <td class="fw-semibold">{{ med.name }}</td>
+                        <td class="text-xs text-muted">{{ med.medicine_code }}</td>
+                        <td><span class="badge bg-danger-subtle text-danger">{{ med.total_stock }}</span></td>
+                        <td class="text-xs text-muted">{{ med.reorder_level }}</td>
+                        <td><a href="{{ url_for('inventory.receive_stock', medicine_id=med.id) }}" class="btn btn-sm btn-outline-primary">Receive Stock</a></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state py-3"><i class="bi bi-check-circle text-success"></i><h5>All stock levels are adequate</h5></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">Recent Stock Movements</h5><a href="{{ url_for('inventory.movements') }}" class="btn btn-sm btn-outline-primary">View All</a></div>
+            <div class="card-body p-0">
+                {% if recent_movements %}
+                <ul class="list-group list-group-flush">
+                {% for m in recent_movements %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-xs fw-semibold">{{ m.medicine.name if m.medicine else '—' }}</div>
+                            <div class="text-xxs text-muted">{{ m.movement_type.replace('_',' ').title() }} | Batch: {{ m.batch.batch_number if m.batch else '—' }}</div>
+                        </div>
+                        <span class="badge {% if 'received' in m.movement_type or 'in' in m.movement_type %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}">
+                            {% if 'received' in m.movement_type or 'in' in m.movement_type %}+{% else %}-{% endif %}{{ m.quantity }}
+                        </span>
+                    </div>
+                </li>
+                {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state py-3"><i class="bi bi-arrow-repeat"></i><h5>No movements yet</h5></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

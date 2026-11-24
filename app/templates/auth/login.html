@@ -1,0 +1,54 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Sign In | PharmLink{% endblock %}
+{% block auth_content %}
+<div class="auth-card">
+    <div class="auth-brand flex-column gap-2">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="PharmLink Logo" class="auth-brand-logo">
+        <span class="auth-brand-text">PharmLink</span>
+    </div>
+    <h2 class="auth-title">Welcome back</h2>
+    <p class="auth-subtitle">Sign in to your healthcare dashboard</p>
+
+    <form method="POST" action="{{ url_for('auth.login') }}" data-loading>
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.email.label(class='form-label') }}
+            {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), placeholder='your@email.com') }}
+            {% for error in form.email.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.password.label(class='form-label') }}
+            <div class="input-group">
+                {{ form.password(class='form-control' + (' is-invalid' if form.password.errors else ''), placeholder='••••••••', id='passwordField') }}
+                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                    <i class="bi bi-eye" id="eyeIcon"></i>
+                </button>
+                {% for error in form.password.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="mb-4">
+            <div class="form-check">
+                {{ form.remember_me(class='form-check-input') }}
+                {{ form.remember_me.label(class='form-check-label text-muted') }}
+            </div>
+        </div>
+        {{ form.submit(class='btn btn-primary w-100') }}
+    </form>
+
+    <div class="text-center mt-3">
+        <small class="text-muted">PharmLink Healthcare Platform &copy; 2026</small>
+    </div>
+</div>
+<script>
+function togglePassword() {
+    const f = document.getElementById('passwordField');
+    const icon = document.getElementById('eyeIcon');
+    if (f.type === 'password') { f.type = 'text'; icon.className = 'bi bi-eye-slash'; }
+    else { f.type = 'password'; icon.className = 'bi bi-eye'; }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Prescription Report</h1></div>
+    <a href="?date_from={{ date_from }}&date_to={{ date_to }}&export=csv" class="btn btn-success btn-sm"><i class="bi bi-download me-1"></i>Export CSV</a>
+</div>
+<div class="card mb-3"><div class="card-body py-2">
+    <form method="GET" class="d-flex gap-2 align-items-center flex-wrap">
+        <label class="text-xs">From:</label><input type="date" name="date_from" class="form-control" style="max-width:160px;" value="{{ date_from }}">
+        <label class="text-xs">To:</label><input type="date" name="date_to" class="form-control" style="max-width:160px;" value="{{ date_to }}">
+        <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+    </form>
+</div></div>
+<div class="card"><div class="card-body p-0">
+    <table class="table table-hover mb-0">
+        <thead><tr><th>Prescription #</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th><th>Items</th></tr></thead>
+        <tbody>
+        {% for p in prescriptions %}
+        <tr>
+            <td><a href="{{ url_for('prescriptions.view', prescription_id=p.id) }}">{{ p.prescription_number }}</a></td>
+            <td>{{ p.patient.full_name if p.patient else '—' }}</td>
+            <td class="text-xs">{{ p.doctor.full_name if p.doctor else '—' }}</td>
+            <td class="text-xs">{{ p.prescription_date.strftime('%d %b %Y') }}</td>
+            <td><span class="badge badge-{{ p.status }}">{{ p.status.replace('_',' ').title() }}</span></td>
+            <td>{{ p.items.count() }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No prescriptions in this date range.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div></div>
+{% endblock %}

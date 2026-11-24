@@ -1,0 +1,34 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Finance Dashboard</h1></div>
+    <a href="{{ url_for('finance.record_payment') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus me-1"></i>Record Payment</a>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-primary"><i class="bi bi-receipt"></i></div><div class="stat-value">{{ stats.total_payments }}</div><div class="stat-label">Total Records</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-warning"><i class="bi bi-hourglass-split"></i></div><div class="stat-value">{{ stats.pending }}</div><div class="stat-label">Pending</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-success"><i class="bi bi-check2-circle"></i></div><div class="stat-value">{{ stats.paid }}</div><div class="stat-label">Paid</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-icon icon-info"><i class="bi bi-bank"></i></div><div class="stat-value">{{ stats.government_funded }}</div><div class="stat-label">Gov-Funded</div></div></div>
+</div>
+<div class="card">
+    <div class="card-header"><h5 class="card-title">Recent Payment Records</h5><a href="{{ url_for('finance.payments') }}" class="btn btn-sm btn-outline-primary">View All</a></div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Reference</th><th>Funding</th><th>Amount Due</th><th>Paid</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for p in recent_payments %}
+            <tr>
+                <td class="fw-semibold">{{ p.payment_reference }}</td>
+                <td class="text-xs">{{ p.funding_type.replace('_',' ').title() }}</td>
+                <td>{{ p.currency }} {{ p.amount_due }}</td>
+                <td>{{ p.currency }} {{ p.amount_paid }}</td>
+                <td><span class="badge bg-secondary-subtle text-secondary">{{ p.status.replace('_',' ').title() }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5"><div class="empty-state py-4"><i class="bi bi-cash-stack"></i><h5>No payment records yet</h5></div></td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

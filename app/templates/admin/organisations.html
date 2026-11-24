@@ -1,0 +1,37 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Organisations</h1></div>
+    <a href="{{ url_for('admin.create_organisation') }}" class="btn btn-primary">
+        <i class="bi bi-plus me-1"></i>Add Organisation
+    </a>
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Name</th><th>Type</th><th>Town</th><th>Contact</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for org in organisations %}
+                <tr>
+                    <td class="fw-semibold">{{ org.name }}</td>
+                    <td>{{ org.org_type_display }}</td>
+                    <td>{{ org.town or '—' }}</td>
+                    <td>{{ org.phone or org.email or '—' }}</td>
+                    <td>
+                        {% if org.is_active %}
+                        <span class="badge bg-success-subtle text-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No organisations registered.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

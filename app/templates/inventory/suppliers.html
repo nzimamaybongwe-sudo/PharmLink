@@ -1,0 +1,25 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header"><div><h1>Suppliers</h1></div><a href="{{ url_for('inventory.medicines') }}" class="btn btn-outline-secondary btn-sm">Back</a></div>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card"><div class="card-header"><h5 class="card-title">Add Supplier</h5></div><div class="card-body">
+            <form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="mb-2"><label class="form-label">Name <span class="text-danger">*</span></label><input type="text" name="name" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label">Contact Person</label><input type="text" name="contact_person" class="form-control"></div>
+                <div class="mb-2"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-control"></div>
+                <div class="mb-2"><label class="form-label">Email</label><input type="email" name="email" class="form-control"></div>
+                <div class="mb-3"><label class="form-label">Address</label><textarea name="address" class="form-control" rows="2"></textarea></div>
+                <button type="submit" class="btn btn-primary w-100">Add Supplier</button>
+            </form>
+        </div></div>
+    </div>
+    <div class="col-md-8">
+        <div class="card"><div class="card-body p-0">
+            <table class="table mb-0"><thead><tr><th>Name</th><th>Contact</th><th>Phone</th><th>Email</th></tr></thead><tbody>
+            {% for s in suppliers %}<tr><td class="fw-semibold">{{ s.name }}</td><td class="text-xs">{{ s.contact_person or '—' }}</td><td class="text-xs">{{ s.phone or '—' }}</td><td class="text-xs">{{ s.email or '—' }}</td></tr>{% endfor %}
+            </tbody></table>
+        </div></div>
+    </div>
+</div>
+{% endblock %}

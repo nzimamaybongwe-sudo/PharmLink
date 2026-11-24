@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="page-header">
+    <div><h1>Inventory Report</h1></div>
+    <a href="?export=csv" class="btn btn-success btn-sm"><i class="bi bi-download me-1"></i>Export CSV</a>
+</div>
+<div class="card"><div class="card-body p-0">
+    <table class="table table-hover mb-0">
+        <thead><tr><th>Code</th><th>Medicine</th><th>Strength</th><th>Stock</th><th>Reorder</th><th>Low Stock</th><th>Expired Batches</th><th>Near Expiry</th></tr></thead>
+        <tbody>
+        {% for d in report_data %}
+        <tr>
+            <td class="text-xs fw-semibold">{{ d.medicine.medicine_code }}</td>
+            <td>{{ d.medicine.name }}</td>
+            <td class="text-xs">{{ d.medicine.strength or '—' }}</td>
+            <td class="fw-semibold">{{ d.total_stock }}</td>
+            <td>{{ d.medicine.reorder_level }}</td>
+            <td>{% if d.is_low %}<span class="badge bg-danger-subtle text-danger">YES</span>{% else %}<span class="badge bg-success-subtle text-success">NO</span>{% endif %}</td>
+            <td>{{ d.expired_batches }}</td>
+            <td>{{ d.near_expiry_batches }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No inventory data.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div></div>
+{% endblock %}
